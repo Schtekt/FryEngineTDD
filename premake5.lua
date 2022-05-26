@@ -8,3 +8,4 @@ workspace "FryWork"
     }
 include "FryEngine"
 include "FryBox"
+include "FryTest"
