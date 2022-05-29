@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../FryEngine/src/Math/FryMath.h"
+#include "Math/FryMath.h"
 
 int main()
 {

@@ -18,7 +18,7 @@ project "FryTest"
     targetdir "../Build/bin/%{prj.name}"
     objdir "../Build/bin-int/%{prj.name}"
     files {"src/**.cpp", "src/**.h"}
-    includedirs{"src/", "../googletest/googletest/include"}
+    includedirs{"../FryEngine/src/", "../googletest/googletest/include"}
     links{"FryEngine", "gTest"}
 
     filter "configurations:Debug"

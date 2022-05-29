@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../FryEngine/src/Math/FryMath.h"
+#include "Math/FryMath.h"
 
 TEST(FryMathVector, Addition)
 {
