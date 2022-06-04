@@ -18,6 +18,8 @@ class ECS
     bool CreateComponent(Entity ent, Args &&... args);
     template<typename T>
     T* GetComponent(Entity ent);
+    template<typename T>
+    bool RemoveComponent(Entity ent);
 private:
     std::vector<std::map<TypeId, ComponentId>> m_entities;
 
@@ -56,4 +58,28 @@ T* ECS::GetComponent(Entity ent)
         return &currTypeList->at(m_entities[ent][typeId]);
     }
     return nullptr;
+}
+
+template<typename T>
+bool ECS::RemoveComponent(Entity ent)
+{
+    size_t typeId = ComponentType<T>::GetId();
+    if(m_entities[ent].count(typeId) > 0)
+    {
+        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
+        ComponentType<T>::CallDestructor(&currTypeList->at(m_entities[ent][typeId]));
+
+        // Component removed, to avoid moving all components and to keep component creation consistent, 
+        // swap its with the last component and reduce the size of the vector by one component.
+        std::memcpy(
+            &currTypeList->at(m_entities[ent][typeId]), 
+            &currTypeList->at(currTypeList->size() - 1), 
+            ComponentType<T>::GetSize()
+        );
+
+        m_components[typeId].resize(m_components[typeId].size() - ComponentType<T>::GetSize());
+
+        return true;
+    }
+    return false;
 }

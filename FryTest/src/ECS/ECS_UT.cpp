@@ -88,3 +88,35 @@ TEST(ECSComponent, CreateMultipleOfMultipleComponents)
     ASSERT_EQ(comp3->m_num, 10.5f);
     ASSERT_EQ(*comp4 ,"This is a string...");
 }
+
+enum ObjectStatus
+{
+    Alive = 0,
+    Destroyed = 1
+};
+
+struct DummyDeleteComponent
+{
+    DummyDeleteComponent(ObjectStatus& status):pStatus(status){pStatus = ObjectStatus::Alive;};
+    ~DummyDeleteComponent(){pStatus = ObjectStatus::Destroyed;};
+    ObjectStatus& pStatus;
+};
+
+TEST(ECSComponent, RemoveComponent)
+{
+    ECS ecs;
+    Entity ent1 = ecs.CreateEntity();
+    Entity ent2 = ecs.CreateEntity();
+
+    ObjectStatus status1;
+    ObjectStatus status2;
+    ecs.CreateComponent<DummyDeleteComponent>(ent1, status1);
+    ecs.CreateComponent<DummyDeleteComponent>(ent2, status2);
+    
+    EXPECT_EQ(status1, ObjectStatus::Alive);
+    EXPECT_EQ(status2, ObjectStatus::Alive);
+
+    ecs.RemoveComponent<DummyDeleteComponent>(ent1);
+    EXPECT_EQ(status1, ObjectStatus::Destroyed);
+    EXPECT_EQ(status2, ObjectStatus::Alive);
+}
