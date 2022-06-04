@@ -15,7 +15,7 @@ TEST(ECSEntity, CreateMultipleEntities)
     Entity ent1 = ecs.CreateEntity();
     Entity ent2 = ecs.CreateEntity();
 
-    ASSERT_TRUE(ent1 != ent2);
+    ASSERT_NE(ent1, ent2);
 }
 
 class DummyComponent
@@ -38,7 +38,8 @@ TEST(ECSComponent, CreateCompponent)
     DummyComponent* comp = ecs.GetComponent<DummyComponent>(ent);
 
     ASSERT_TRUE(comp);
-    ASSERT_TRUE(comp->m_name == "MyDummy" && comp->m_num == 5.5f);
+    ASSERT_EQ(comp->m_name, "MyDummy");
+    ASSERT_EQ(comp->m_num, 5.5f);
 }
 
 TEST(ECSComponent, CreateMultipleOfSameComponent)
@@ -55,12 +56,14 @@ TEST(ECSComponent, CreateMultipleOfSameComponent)
     DummyComponent* comp2 = ecs.GetComponent<DummyComponent>(ent2);
 
     ASSERT_TRUE(comp1 && comp2);
-    ASSERT_TRUE(comp1->m_name == "MyDummy" && comp1->m_num == 5.5f && 
-                comp2->m_name == "MySecondDummy" && comp2->m_num == 10.5f);
+    ASSERT_EQ(comp1->m_name, "MyDummy");
+    ASSERT_EQ(comp1->m_num, 5.5f);
+    ASSERT_EQ(comp2->m_name, "MySecondDummy");
+    ASSERT_EQ(comp2->m_num, 10.5f);
 
 }
 
-TEST(ECSComponent, CreateMultippleOfMultipleComponents)
+TEST(ECSComponent, CreateMultipleOfMultipleComponents)
 {
     ECS ecs;
     
@@ -78,8 +81,10 @@ TEST(ECSComponent, CreateMultippleOfMultipleComponents)
     std::string* comp4      = ecs.GetComponent<std::string>(ent1);
 
     ASSERT_TRUE(comp1 && comp2 && comp3 && comp4);
-    ASSERT_TRUE(comp1->m_name == "MyDummy" && comp1->m_num == 5.5f && 
-                *comp2 == 15.0f &&
-                comp3->m_name == "MySecondDummy" && comp3->m_num == 10.5f &&
-                *comp4 == "This is a string...");
+    ASSERT_EQ(comp1->m_name, "MyDummy");
+    ASSERT_EQ(comp1->m_num, 5.5f);
+    ASSERT_EQ(*comp2, 15.0f);
+    ASSERT_EQ(comp3->m_name, "MySecondDummy");
+    ASSERT_EQ(comp3->m_num, 10.5f);
+    ASSERT_EQ(*comp4 ,"This is a string...");
 }

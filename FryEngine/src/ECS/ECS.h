@@ -4,6 +4,8 @@
 #include <map>
 #include "Component.h"
 using Entity = size_t;
+using TypeId = size_t;
+using ComponentId = size_t;
 
 class ECS
 {
@@ -13,37 +15,45 @@ class ECS
 
     Entity CreateEntity();
     template<typename T, typename ...Args>
-    void CreateComponent(Entity ent, Args... args);
+    bool CreateComponent(Entity ent, Args &&... args);
     template<typename T>
     T* GetComponent(Entity ent);
 private:
-    std::vector<Entity> m_entities;
+    std::vector<std::map<TypeId, ComponentId>> m_entities;
 
     std::vector<BaseComponentType*> m_compTypes;
     std::map<size_t, std::vector<char>> m_components;
-    std::map<size_t, std::vector<Entity>> m_compToEntityRel;
 };
 
 template<typename T, typename ...Args>
-void ECS::CreateComponent(Entity ent, Args... args)
+bool ECS::CreateComponent(Entity ent, Args&& ... args)
 {
     size_t typeId = ComponentType<T>::GetId();
-    std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
-    currTypeList->emplace_back(std::forward<Args>(args)...);
+    if(m_entities[ent].count(typeId) == 0)
+    {
+        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
 
-    m_compToEntityRel[typeId].emplace_back(ent);
+        m_entities[ent][typeId] = currTypeList->size();
+
+        size_t sizeOfComponent = ComponentType<T>::GetSize();
+        size_t oldSizeOfVector = m_components[typeId].size();
+
+        m_components[typeId].resize(oldSizeOfVector + sizeOfComponent);
+
+        new (&m_components[typeId].at(oldSizeOfVector)) T(std::forward<Args>(args)...);
+        return true;
+    }
+    return false;
 }
 
 template<typename T>
 T* ECS::GetComponent(Entity ent)
 {
     size_t typeId = ComponentType<T>::GetId();
-    for(int i = 0; i < m_compToEntityRel[typeId].size(); i++)
+    if(m_entities[ent].count(typeId) > 0)
     {
-        if(m_compToEntityRel[typeId].at(i) == ent)
-        {
-            return (T*)(&m_components[typeId].at(ComponentType<T>::GetSize() * i));
-        }
+        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
+        return &currTypeList->at(m_entities[ent][typeId]);
     }
     return nullptr;
 }
