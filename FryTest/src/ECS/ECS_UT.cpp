@@ -122,3 +122,33 @@ TEST(ECSComponent, RemoveComponent)
 
     EXPECT_FALSE(ecs.GetComponent<DummyDeleteComponent>(ent1));
 }
+
+struct DummyDeleteComponentSecond
+{
+    DummyDeleteComponentSecond(ObjectStatus& status):pStatus(status){pStatus = ObjectStatus::Alive;};
+    ~DummyDeleteComponentSecond(){pStatus = ObjectStatus::Destroyed;};
+    ObjectStatus& pStatus;
+};
+
+TEST(ECSEntity, RemoveEntity)
+{
+    ECS ecs;
+    Entity ent1 = ecs.CreateEntity();
+    Entity ent2 = ecs.CreateEntity();
+
+    ObjectStatus status1;
+    ObjectStatus status2;
+    ObjectStatus status3;
+    ecs.CreateComponent<DummyDeleteComponent>(ent1, status1);
+    ecs.CreateComponent<DummyDeleteComponentSecond>(ent1, status2);
+    ecs.CreateComponent<DummyDeleteComponent>(ent2, status3);
+    
+    EXPECT_EQ(status1, ObjectStatus::Alive);
+    EXPECT_EQ(status2, ObjectStatus::Alive);
+    EXPECT_EQ(status3, ObjectStatus::Alive);
+
+    ecs.RemoveEntity(ent1);
+    EXPECT_EQ(status1, ObjectStatus::Destroyed);
+    EXPECT_EQ(status2, ObjectStatus::Destroyed);
+    EXPECT_EQ(status3, ObjectStatus::Alive);
+}

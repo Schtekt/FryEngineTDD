@@ -20,6 +20,7 @@ class ECS
     T* GetComponent(Entity ent);
     template<typename T>
     bool RemoveComponent(Entity ent);
+    bool RemoveEntity(Entity ent);
 private:
     bool removeComponentInternal(TypeId type, ComponentId id);
     std::vector<std::map<TypeId, ComponentId>> m_entities;
