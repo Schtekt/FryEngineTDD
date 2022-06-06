@@ -3,3 +3,9 @@ Build
 **.vcxproj
 **.sln
 **.exe
+*.user
+.vscode/settings.json
+*.db
+*.ipch
+.vs/FryWork/v17/.suo
+.vs/FryWork/project-colors.json

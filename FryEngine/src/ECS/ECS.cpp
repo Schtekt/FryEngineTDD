@@ -6,7 +6,10 @@ ECS::ECS()
 
 ECS::~ECS()
 {
-
+    for(auto compCont : m_components)
+    {
+        delete compCont.second;
+    }
 }
 
 Entity ECS::CreateEntity()

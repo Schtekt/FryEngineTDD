@@ -119,4 +119,6 @@ TEST(ECSComponent, RemoveComponent)
     ecs.RemoveComponent<DummyDeleteComponent>(ent1);
     EXPECT_EQ(status1, ObjectStatus::Destroyed);
     EXPECT_EQ(status2, ObjectStatus::Alive);
+
+    EXPECT_FALSE(ecs.GetComponent<DummyDeleteComponent>(ent1));
 }

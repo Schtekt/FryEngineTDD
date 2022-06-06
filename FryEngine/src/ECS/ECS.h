@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include <map>
-#include "Component.h"
+#include "ComponentContainer.h"
 using Entity = size_t;
 using TypeId = size_t;
 using ComponentId = size_t;
@@ -21,28 +21,23 @@ class ECS
     template<typename T>
     bool RemoveComponent(Entity ent);
 private:
+    bool removeComponentInternal(TypeId type, ComponentId id);
     std::vector<std::map<TypeId, ComponentId>> m_entities;
-
-    std::vector<BaseComponentType*> m_compTypes;
-    std::map<size_t, std::vector<char>> m_components;
+    std::map<TypeId, BaseComponentContainer*> m_components;
 };
 
 template<typename T, typename ...Args>
 bool ECS::CreateComponent(Entity ent, Args&& ... args)
 {
-    size_t typeId = ComponentType<T>::GetId();
+    size_t typeId = ComponentContainer<T>::GetId();
+    if(m_components.count(typeId) == 0)
+    {
+        m_components[typeId] = new ComponentContainer<T>();
+    }
+
     if(m_entities[ent].count(typeId) == 0)
     {
-        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
-
-        m_entities[ent][typeId] = currTypeList->size();
-
-        size_t sizeOfComponent = ComponentType<T>::GetSize();
-        size_t oldSizeOfVector = m_components[typeId].size();
-
-        m_components[typeId].resize(oldSizeOfVector + sizeOfComponent);
-
-        new (&m_components[typeId].at(oldSizeOfVector)) T(std::forward<Args>(args)...);
+        m_entities[ent][typeId] = reinterpret_cast<ComponentContainer<T>*>(m_components[typeId])->Emplace(std::forward<Args>(args)...);
         return true;
     }
     return false;
@@ -51,11 +46,10 @@ bool ECS::CreateComponent(Entity ent, Args&& ... args)
 template<typename T>
 T* ECS::GetComponent(Entity ent)
 {
-    size_t typeId = ComponentType<T>::GetId();
+    size_t typeId = ComponentContainer<T>::GetId();
     if(m_entities[ent].count(typeId) > 0)
     {
-        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
-        return &currTypeList->at(m_entities[ent][typeId]);
+        return reinterpret_cast<T*>(m_components[typeId]->GetComponent(m_entities[ent][typeId]));
     }
     return nullptr;
 }
@@ -63,21 +57,25 @@ T* ECS::GetComponent(Entity ent)
 template<typename T>
 bool ECS::RemoveComponent(Entity ent)
 {
-    size_t typeId = ComponentType<T>::GetId();
+    size_t typeId = ComponentContainer<T>::GetId();
     if(m_entities[ent].count(typeId) > 0)
     {
-        std::vector<T>* currTypeList = reinterpret_cast<std::vector<T>*>(&m_components[typeId]);
-        ComponentType<T>::CallDestructor(&currTypeList->at(m_entities[ent][typeId]));
+        m_components[typeId]->RemoveComponent(m_entities[ent][typeId]);
 
-        // Component removed, to avoid moving all components and to keep component creation consistent, 
-        // swap its with the last component and reduce the size of the vector by one component.
-        std::memcpy(
-            &currTypeList->at(m_entities[ent][typeId]), 
-            &currTypeList->at(currTypeList->size() - 1), 
-            ComponentType<T>::GetSize()
-        );
-
-        m_components[typeId].resize(m_components[typeId].size() - ComponentType<T>::GetSize());
+        // Find the entity that had the last component of the list.
+        size_t lastPosition = m_components[typeId]->GetSize();
+        if(m_entities[ent][typeId] != lastPosition)
+        {
+            for(auto affectedEnt : m_entities)
+            {
+                if(affectedEnt[typeId] == lastPosition)
+                {
+                    affectedEnt[typeId] = m_entities[ent][typeId];
+                }
+            }
+        }
+        // The entity no longer has that component. Remove it.
+        m_entities[ent].erase(typeId);
 
         return true;
     }
