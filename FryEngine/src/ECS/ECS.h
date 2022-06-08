@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include "ComponentContainer.h"
+#include "System.h"
 using Entity = size_t;
 using TypeId = size_t;
 using ComponentId = size_t;
@@ -21,6 +22,8 @@ class ECS
     template<typename T>
     bool RemoveComponent(Entity ent);
     bool RemoveEntity(Entity ent);
+    void UpdateSystem(BaseSystem* system);
+    void UpdateSystem(std::initializer_list<BaseSystem*>&& systems);
 private:
     bool removeComponentInternal(TypeId type, ComponentId id);
     std::vector<std::map<TypeId, ComponentId>> m_entities;

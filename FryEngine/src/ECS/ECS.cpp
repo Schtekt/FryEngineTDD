@@ -42,3 +42,34 @@ bool ECS::RemoveEntity(Entity ent)
     m_entities.erase(m_entities.begin() + ent);
     return true;
 }
+
+void ECS::UpdateSystem(BaseSystem* system)
+{
+    for(auto type : m_components)
+    {
+        if(type.first == system->GetComponentType())
+        {
+            for(int i = 0; i < type.second->GetSize(); i++)
+            {
+                system->UpdateComponent(type.second->GetComponent(i));
+            }
+        }
+    }
+}
+
+void ECS::UpdateSystem(std::initializer_list<BaseSystem*>&& systems)
+{
+    for(auto system : systems)
+    {
+        for(auto type : m_components)
+        {
+            if(type.first == system->GetComponentType())
+            {
+                for(int i = 0; i < type.second->GetSize(); i++)
+                {
+                    system->UpdateComponent(type.second->GetComponent(i));
+                }
+            }
+        }
+    }
+}
