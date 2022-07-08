@@ -10,7 +10,7 @@ class AddOneSystem : public BaseSystem
     }
 
     void UpdateComponent(void* component){
-        int* num = reinterpret_cast<int*>(component);
+        int* num = static_cast<int*>(component);
         (*num)++;
     }
 };
@@ -44,7 +44,7 @@ class MultiplySystem : public BaseSystem
     }
 
     void UpdateComponent(void* component){
-        int* num = reinterpret_cast<int*>(component);
+        int* num = static_cast<int*>(component);
         (*num) *= m_multiplier;
     }
 
@@ -82,7 +82,7 @@ class DivideSystem : public BaseSystem
     }
 
     void UpdateComponent(void* component){
-        int* num = reinterpret_cast<int*>(component);
+        int* num = static_cast<int*>(component);
         (*num) *= m_divider;
     }
 
