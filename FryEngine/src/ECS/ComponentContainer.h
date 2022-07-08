@@ -9,7 +9,7 @@ class BaseComponentContainer
     std::vector<char> m_compList;
  public:
     virtual size_t GetSize() const = 0;
-    virtual void* GetComponent(size_t index) = 0;
+    virtual void* GetComponentEntry(size_t index) = 0;
     virtual void RemoveComponent(size_t index) = 0;
     virtual ~BaseComponentContainer(){};
 };
@@ -26,7 +26,7 @@ class ComponentContainer : public BaseComponentContainer
 
     template<typename ... Args>
     size_t Emplace(Args && ... args);
-    void* GetComponent(size_t index);
+    void* GetComponentEntry(size_t index);
     void RemoveComponent(size_t index);
 
  private:
@@ -80,7 +80,7 @@ size_t ComponentContainer<T>::Emplace(Args && ... args)
 }
 
 template<typename T>
-void* ComponentContainer<T>::GetComponent(size_t index)
+void* ComponentContainer<T>::GetComponentEntry(size_t index)
 {
     std::vector<T>* reinterpretCompList = reinterpret_cast<std::vector<T>*>(&m_compList);
     return &reinterpretCompList->at(index);

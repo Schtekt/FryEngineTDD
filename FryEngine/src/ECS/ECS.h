@@ -24,6 +24,8 @@ class ECS
     void UpdateSystem(BaseSystem* system);
     void UpdateSystem(std::initializer_list<BaseSystem*>&& systems);
 private:
+    void updateSystemMultipleComponents(BaseSystem* system);
+    void updateSystemSingleComponent(std::initializer_list<BaseSystem*>&& systems);
     bool removeComponentInternal(TypeId type, ComponentId id);
     std::vector<std::map<TypeId, ComponentId>> m_entities;
     std::map<TypeId, BaseComponentContainer*> m_components;
@@ -52,7 +54,7 @@ T* ECS::GetComponent(Entity ent)
     size_t typeId = ComponentContainer<ComponentEntry<T>>::GetId();
     if(m_entities[ent].count(typeId) > 0)
     {
-        return static_cast<T*>(static_cast<ComponentEntry<T>*>(m_components[typeId]->GetComponent(m_entities[ent][typeId]))->GetComponent());
+        return static_cast<T*>(static_cast<ComponentEntry<T>*>(m_components[typeId]->GetComponentEntry(m_entities[ent][typeId]))->GetComponent());
     }
     return nullptr;
 }
