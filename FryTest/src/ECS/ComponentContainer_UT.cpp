@@ -1,19 +1,6 @@
 #include <gtest/gtest.h>
 #include "ECS/ComponentContainer.h"
-
-enum ObjectStatus
-{
-    Alive = 0,
-    Destroyed = 1
-};
-
-struct DummyDeleteComponent
-{
-    DummyDeleteComponent(ObjectStatus& status, const char* text):pStatus(status), name(text) {pStatus = ObjectStatus::Alive;};
-    ~DummyDeleteComponent(){pStatus = ObjectStatus::Destroyed;};
-    ObjectStatus& pStatus;
-    std::string name;
-};
+#include "ECSTestHelpers.h"
 
 TEST(ECSComponentContainer, Instantiate)
 {

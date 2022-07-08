@@ -1,6 +1,7 @@
 class DummyComponent;
 #include <gtest/gtest.h>
 #include "ECS/ECS.h"
+#include "ECSTestHelpers.h"
 
 TEST(ECSEntity, CreateEntity)
 {
@@ -17,15 +18,6 @@ TEST(ECSEntity, CreateMultipleEntities)
 
     ASSERT_NE(ent1, ent2);
 }
-
-class DummyComponent
-{
- public:
-    DummyComponent(std::string name, float num): m_name(name), m_num(num) {};
-
-    std::string m_name;
-    float m_num;
-};
 
 TEST(ECSComponent, CreateCompponent)
 {
@@ -89,19 +81,6 @@ TEST(ECSComponent, CreateMultipleOfMultipleComponents)
     ASSERT_EQ(*comp4 ,"This is a string...");
 }
 
-enum ObjectStatus
-{
-    Alive = 0,
-    Destroyed = 1
-};
-
-struct DummyDeleteComponent
-{
-    DummyDeleteComponent(ObjectStatus& status):pStatus(status){pStatus = ObjectStatus::Alive;};
-    ~DummyDeleteComponent(){pStatus = ObjectStatus::Destroyed;};
-    ObjectStatus& pStatus;
-};
-
 TEST(ECSComponent, RemoveComponent)
 {
     ECS ecs;
@@ -122,13 +101,6 @@ TEST(ECSComponent, RemoveComponent)
 
     EXPECT_FALSE(ecs.GetComponent<DummyDeleteComponent>(ent1));
 }
-
-struct DummyDeleteComponentSecond
-{
-    DummyDeleteComponentSecond(ObjectStatus& status):pStatus(status){pStatus = ObjectStatus::Alive;};
-    ~DummyDeleteComponentSecond(){pStatus = ObjectStatus::Destroyed;};
-    ObjectStatus& pStatus;
-};
 
 TEST(ECSEntity, RemoveEntity)
 {

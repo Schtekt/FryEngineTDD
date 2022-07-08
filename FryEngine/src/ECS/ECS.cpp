@@ -51,7 +51,7 @@ void ECS::UpdateSystem(BaseSystem* system)
         {
             for(int i = 0; i < type.second->GetSize(); i++)
             {
-                system->UpdateComponent(type.second->GetComponent(i));
+                system->UpdateComponent(static_cast<ComponentBase*>(type.second->GetComponent(i))->GetComponent());
             }
         }
     }
@@ -67,7 +67,7 @@ void ECS::UpdateSystem(std::initializer_list<BaseSystem*>&& systems)
             {
                 for(int i = 0; i < type.second->GetSize(); i++)
                 {
-                    system->UpdateComponent(type.second->GetComponent(i));
+                    system->UpdateComponent(static_cast<ComponentBase*>(type.second->GetComponent(i))->GetComponent());
                 }
             }
         }

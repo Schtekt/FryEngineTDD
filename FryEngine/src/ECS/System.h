@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "ComponentContainer.h"
+#include "ComponentEntry.h"
 using TypeId = size_t;
 
 class BaseSystem
@@ -20,5 +21,5 @@ private:
 template<typename T>
 void BaseSystem::addComponentType()
 {
-    m_ComponentType = ComponentContainer<T>::GetId();
+    m_ComponentType = ComponentContainer<ComponentEntry<T>>::GetId();
 }
