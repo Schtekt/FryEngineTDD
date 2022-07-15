@@ -9,3 +9,5 @@ Build
 *.ipch
 .vs/FryWork/v17/.suo
 .vs/FryWork/project-colors.json
+
+.vscode/
