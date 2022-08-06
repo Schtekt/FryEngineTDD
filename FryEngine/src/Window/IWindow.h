@@ -1,8 +1,8 @@
 #pragma once
 #include <cinttypes>
+#include "WindowTypes.h"
 namespace FryEngine
 {
-
     class IWindow
     {
     public:
@@ -17,11 +17,11 @@ namespace FryEngine
 
         virtual ~IWindow() {};
         virtual void Show() = 0;
-        virtual void Clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
         virtual void ProcessMessages() = 0;
         virtual bool IsAlive() = 0;
-        virtual void Render() = 0;
-        virtual void Present() = 0;
+        const window_type* GetWindowHandle() const {return &m_WindowHandle; }
+        int GetWidth() const { return m_Width;};
+        int GetHeight() const { return m_Height;};
 
     protected:
         const char* m_pTitle;
@@ -30,6 +30,6 @@ namespace FryEngine
         int m_Height;
         int m_PosX;
         int m_PosY;
+        window_type m_WindowHandle;
     };
-
 } // FryEngine

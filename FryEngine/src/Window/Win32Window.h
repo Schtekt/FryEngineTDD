@@ -15,25 +15,10 @@ namespace FryEngine
         void Clear(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
         void ProcessMessages();
         bool IsAlive();
-        void Render();
         void Present();
 
     private:
         bool createWindowHandle();
-        bool createInterface();
-        bool createRenderTargetView();
-        bool createDepthStencil();
-        void createViewPort();
-
-        HWND m_WindowHandle;
-
-        ID3D11Device* m_pDevice;
-        ID3D11DeviceContext* m_pImmediateContext;
-        IDXGISwapChain* m_pSwapChain;
-        ID3D11RenderTargetView* m_pRtv;
-        ID3D11Texture2D* m_pDsTexture;
-        ID3D11DepthStencilView* m_pDsView;
-        D3D11_VIEWPORT m_ViewPort;
     };
 }
 

@@ -4,17 +4,22 @@
 #include <d3dcompiler.h>
 #include <strsafe.h>
 #include <iostream>
+#include "Rendering/DxDevice.h"
 #include "Window/Win32Window.h"
 
 int main()
 {
-    FryEngine::Win32Window win;
+    FryEngine::Win32Window win("Sandbox window", false, 800, 800, 200, 10);
+    FryEngine::DxDevice device(&win);
+    
     win.Show();
-    win.Clear(0, 255, 0, 255);
+
     while(win.IsAlive())
     {
         win.ProcessMessages();
-        win.Present();
+
+        device.ClearView(255,0,0,255);
+        device.Present();
     }
 
     return 0;
