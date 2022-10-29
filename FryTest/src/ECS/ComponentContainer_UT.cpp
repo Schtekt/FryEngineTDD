@@ -4,7 +4,7 @@
 
 TEST(ECSComponentContainer, Instantiate)
 {
-    std::unique_ptr<BaseComponentContainer> ptr(new ComponentContainer<DummyDeleteComponent>);
+    std::unique_ptr<BaseComponentContainer> ptr(std::make_unique<ComponentContainer<DummyDeleteComponent>>());
 }
 
 TEST(ECSComponentContainer, GetComponent)

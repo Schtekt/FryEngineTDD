@@ -5,14 +5,6 @@ ECS::ECS()
 
 }
 
-ECS::~ECS()
-{
-    for(auto compCont : m_components)
-    {
-        delete compCont.second;
-    }
-}
-
 Entity ECS::CreateEntity()
 {
     m_entities.emplace_back();
@@ -50,6 +42,7 @@ void ECS::UpdateSystem(BaseSystem* system)
     {
         throw std::invalid_argument("System without a required component was trying to update!");
     }
+
     std::vector<void*> comps;
     comps.resize(system->GetComponentTypes().size());
 
@@ -63,11 +56,11 @@ void ECS::UpdateSystem(BaseSystem* system)
     {
         const auto & types = system->GetComponentTypes();
 
-        BaseComponentContainer* compCont = m_components[types[0].first];
+        BaseComponentContainer& compCont = *m_components[types[0].first];
 
-        for(int i = 0; i < compCont->GetSize(); i++)
+        for(int i = 0; i < compCont.GetSize(); i++)
         {
-            comps[0] = static_cast<ComponentBase*>(compCont->GetComponentEntry(i))->GetComponent();
+            comps[0] = static_cast<ComponentBase*>(compCont.GetComponentEntry(i))->GetComponent();
             system->UpdateComponents(comps);
         }
     }
@@ -76,11 +69,11 @@ void ECS::UpdateSystem(BaseSystem* system)
     {
         const auto & types = system->GetComponentTypes();
 
-        BaseComponentContainer* compCont = m_components[types[0].first];
+        BaseComponentContainer& compCont = *m_components[types[0].first];
 
-        for(int i = 0; i < compCont->GetSize(); i++)
+        for(int i = 0; i < compCont.GetSize(); i++)
         {
-            ComponentBase* driverComponent = static_cast<ComponentBase*>(compCont->GetComponentEntry(i));
+            ComponentBase* driverComponent = static_cast<ComponentBase*>(compCont.GetComponentEntry(i));
             auto& parent = m_entities[driverComponent->GetEntity()];
             comps[0] = driverComponent->GetComponent();
 
@@ -135,7 +128,7 @@ void ECS::updateSystemSingleComponent(std::initializer_list<BaseSystem*>&& syste
 {
     for(auto system : systems)
     {
-        for(auto type : m_components)
+        for(auto& type : m_components)
         {
             if(type.first == system->GetComponentTypes()[0].first)
             {

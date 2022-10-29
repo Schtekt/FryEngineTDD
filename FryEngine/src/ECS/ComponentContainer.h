@@ -11,7 +11,7 @@ class BaseComponentContainer
     virtual size_t GetSize() const = 0;
     virtual void* GetComponentEntry(size_t index) = 0;
     virtual void RemoveComponent(size_t index) = 0;
-    virtual ~BaseComponentContainer(){};
+    virtual ~BaseComponentContainer() = default;
 };
 
 
@@ -19,7 +19,7 @@ template<typename T>
 class ComponentContainer : public BaseComponentContainer
 {
  public:
-    ~ComponentContainer();
+    virtual ~ComponentContainer();
     static size_t GetId();
     static size_t GetSizeOfComp();
     size_t GetSize() const;

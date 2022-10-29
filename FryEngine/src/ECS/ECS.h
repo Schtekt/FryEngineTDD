@@ -11,7 +11,7 @@ class ECS
 {
  public:
     ECS();
-    ~ECS();
+    ~ECS() = default;
 
     Entity CreateEntity();
     template<typename T, typename ...Args>
@@ -28,7 +28,7 @@ private:
     void updateSystemSingleComponent(std::initializer_list<BaseSystem*>&& systems);
     bool removeComponentInternal(TypeId type, ComponentId id);
     std::vector<std::map<TypeId, ComponentId>> m_entities;
-    std::map<TypeId, BaseComponentContainer*> m_components;
+    std::map<TypeId, std::unique_ptr<BaseComponentContainer>> m_components;
 };
 
 template<typename T, typename ...Args>
@@ -37,12 +37,14 @@ bool ECS::CreateComponent(Entity ent, Args&& ... args)
     size_t typeId = ComponentContainer<ComponentEntry<T>>::GetId();
     if(m_components.count(typeId) == 0)
     {
-        m_components[typeId] = new ComponentContainer<ComponentEntry<T>>();
+        m_components[typeId] = std::make_unique<ComponentContainer<ComponentEntry<T>>>();
     }
 
     if(m_entities[ent].count(typeId) == 0)
     {
-        m_entities[ent][typeId] = reinterpret_cast<ComponentContainer<ComponentEntry<T>>*>(m_components[typeId])->Emplace(ent, std::forward<Args>(args)...);
+        auto* requestedContainer = reinterpret_cast<ComponentContainer<ComponentEntry<T>>*>(m_components[typeId].get());
+
+        m_entities[ent][typeId] = requestedContainer->Emplace(ent, std::forward<Args>(args)...);
         return true;
     }
     return false;
@@ -54,7 +56,8 @@ T* ECS::GetComponent(Entity ent)
     size_t typeId = ComponentContainer<ComponentEntry<T>>::GetId();
     if(m_entities[ent].count(typeId) > 0)
     {
-        return static_cast<T*>(static_cast<ComponentEntry<T>*>(m_components[typeId]->GetComponentEntry(m_entities[ent][typeId]))->GetComponent());
+        auto* componentEntry = static_cast<ComponentEntry<T>*>(m_components[typeId]->GetComponentEntry(m_entities[ent][typeId]));
+        return static_cast<T*>(componentEntry->GetComponent());
     }
     return nullptr;
 }
@@ -67,7 +70,6 @@ bool ECS::RemoveComponent(Entity ent)
     {
         m_components[typeId]->RemoveComponent(m_entities[ent][typeId]);
 
-        // Find the entity that had the last component of the list.
         size_t lastPosition = m_components[typeId]->GetSize();
         if(m_entities[ent][typeId] != lastPosition)
         {
@@ -79,7 +81,6 @@ bool ECS::RemoveComponent(Entity ent)
                 }
             }
         }
-        // The entity no longer has that component. Remove it.
         m_entities[ent].erase(typeId);
 
         return true;
