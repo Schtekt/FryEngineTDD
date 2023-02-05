@@ -9,15 +9,14 @@ TEST(ECSComponentContainer, Instantiate)
 
 TEST(ECSComponentContainer, GetComponent)
 {
-    ObjectStatus stat;
+    auto stat = std::make_shared<ObjectStatus>();
     {
         ComponentContainer<DummyDeleteComponent> compCont;
 
-        stat = ObjectStatus::Alive;
         DummyDeleteComponent* compPtr = (DummyDeleteComponent*)compCont.GetComponentEntry(compCont.Emplace(stat, "Hello"));
         ASSERT_TRUE(compPtr);
-        ASSERT_EQ(stat, ObjectStatus::Alive);
+        ASSERT_EQ(*stat.get(), ObjectStatus::Alive);
         ASSERT_EQ(compPtr->name, "Hello");
     }
-    ASSERT_EQ(stat, ObjectStatus::Destroyed);
+    ASSERT_EQ(*stat.get(), ObjectStatus::Destroyed);
 }

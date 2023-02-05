@@ -17,15 +17,15 @@ enum ObjectStatus
 
 struct DummyDeleteComponent
 {
-    DummyDeleteComponent(ObjectStatus& status, const char* text = ""):pStatus(status), name(text) {pStatus = ObjectStatus::Alive;};
-    ~DummyDeleteComponent(){pStatus = ObjectStatus::Destroyed;};
-    ObjectStatus& pStatus;
+    DummyDeleteComponent(std::shared_ptr<ObjectStatus>& status, const char* text = ""):spStatus(status), name(text) {*spStatus.get() = ObjectStatus::Alive;};
+    ~DummyDeleteComponent(){if(spStatus.use_count() == 2){*spStatus.get() = ObjectStatus::Destroyed;}};
+    std::shared_ptr<ObjectStatus> spStatus;
     std::string name;
 };
 
 struct DummyDeleteComponentSecond
 {
-    DummyDeleteComponentSecond(ObjectStatus& status):pStatus(status){pStatus = ObjectStatus::Alive;};
-    ~DummyDeleteComponentSecond(){pStatus = ObjectStatus::Destroyed;};
-    ObjectStatus& pStatus;
+    DummyDeleteComponentSecond(std::shared_ptr<ObjectStatus>& status):spStatus(status){*spStatus.get() = ObjectStatus::Alive;};
+    ~DummyDeleteComponentSecond(){*spStatus.get() = ObjectStatus::Destroyed;};
+    std::shared_ptr<ObjectStatus> spStatus;
 };

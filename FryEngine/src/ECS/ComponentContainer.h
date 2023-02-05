@@ -73,10 +73,14 @@ template<typename T>
 template<typename ... Args>
 size_t ComponentContainer<T>::Emplace(Args && ... args)
 {
-    size_t currSize = m_compList.size();
-    m_compList.resize(currSize + m_sSizeOfComp);
-    new (&m_compList[currSize]) T(std::forward<Args>(args)...);
-    return (m_compList.size() / m_sSizeOfComp) - 1;
+    auto reinterpretCompList = reinterpret_cast<std::vector<T>*>(&m_compList);
+    reinterpretCompList->emplace_back(std::forward<Args>(args)...);
+    return reinterpretCompList->size() - 1;
+    
+    //size_t currSize = m_compList.size();
+    //m_compList.resize(currSize + m_sSizeOfComp);
+    //new (&m_compList[currSize]) T(std::forward<Args>(args)...);
+    //return (m_compList.size() / m_sSizeOfComp) - 1;
 }
 
 template<typename T>

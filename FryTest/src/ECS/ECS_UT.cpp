@@ -87,17 +87,17 @@ TEST(ECSComponent, RemoveComponent)
     Entity ent1 = ecs.CreateEntity();
     Entity ent2 = ecs.CreateEntity();
 
-    ObjectStatus status1;
-    ObjectStatus status2;
+    auto status1 = std::make_shared<ObjectStatus>();
+    auto status2 = std::make_shared<ObjectStatus>();
     ecs.CreateComponent<DummyDeleteComponent>(ent1, status1);
     ecs.CreateComponent<DummyDeleteComponent>(ent2, status2);
     
-    EXPECT_EQ(status1, ObjectStatus::Alive);
-    EXPECT_EQ(status2, ObjectStatus::Alive);
+    EXPECT_EQ(*status1.get(), ObjectStatus::Alive);
+    EXPECT_EQ(*status2.get(), ObjectStatus::Alive);
 
     ecs.RemoveComponent<DummyDeleteComponent>(ent1);
-    EXPECT_EQ(status1, ObjectStatus::Destroyed);
-    EXPECT_EQ(status2, ObjectStatus::Alive);
+    EXPECT_EQ(*status1.get(), ObjectStatus::Destroyed);
+    EXPECT_EQ(*status2.get(), ObjectStatus::Alive);
 
     EXPECT_FALSE(ecs.GetComponent<DummyDeleteComponent>(ent1));
 }
@@ -108,19 +108,19 @@ TEST(ECSEntity, RemoveEntity)
     Entity ent1 = ecs.CreateEntity();
     Entity ent2 = ecs.CreateEntity();
 
-    ObjectStatus status1;
-    ObjectStatus status2;
-    ObjectStatus status3;
+    auto status1 = std::make_shared<ObjectStatus>();
+    auto status2 = std::make_shared<ObjectStatus>();
+    auto status3 = std::make_shared<ObjectStatus>();
     ecs.CreateComponent<DummyDeleteComponent>(ent1, status1);
     ecs.CreateComponent<DummyDeleteComponentSecond>(ent1, status2);
     ecs.CreateComponent<DummyDeleteComponent>(ent2, status3);
     
-    EXPECT_EQ(status1, ObjectStatus::Alive);
-    EXPECT_EQ(status2, ObjectStatus::Alive);
-    EXPECT_EQ(status3, ObjectStatus::Alive);
+    EXPECT_EQ(*status1.get(), ObjectStatus::Alive);
+    EXPECT_EQ(*status2.get(), ObjectStatus::Alive);
+    EXPECT_EQ(*status3.get(), ObjectStatus::Alive);
 
     ecs.RemoveEntity(ent1);
-    EXPECT_EQ(status1, ObjectStatus::Destroyed);
-    EXPECT_EQ(status2, ObjectStatus::Destroyed);
-    EXPECT_EQ(status3, ObjectStatus::Alive);
+    EXPECT_EQ(*status1.get(), ObjectStatus::Destroyed);
+    EXPECT_EQ(*status2.get(), ObjectStatus::Destroyed);
+    EXPECT_EQ(*status3.get(), ObjectStatus::Alive);
 }
